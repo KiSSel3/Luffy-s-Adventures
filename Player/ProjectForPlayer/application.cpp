@@ -3,7 +3,7 @@
 Application::Application(std::string filePath) : filePath(filePath) {
     mainWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920,1080),"",sf::Style::Fullscreen);
 
-    this->filePath.erase(this->filePath.find("Player\\build", 0));
+    this->filePath.erase(this->filePath.find("Player\\ProjectForPlayer", 0));
     std::replace(this->filePath.begin(),this->filePath.end(),'\\','/');
 }
 
