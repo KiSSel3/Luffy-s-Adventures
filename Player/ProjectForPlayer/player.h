@@ -28,13 +28,15 @@ private:
                     StandGun, MovingLeftGun, MovingRightGun, JumpGun, DropGun,
                    } state;
 
+    enum DirectionEnum {Right, Left} direction;
+
     void collision()            override;  // = 0
     void healthChange()         override;  // = 0
     void motionFrameChange()    override;  // = 0
 
     void stateControl();
 
-    void stateStand();
+    void stateStand(DirectionEnum& direction);
     void stateMovingLeft();
     void stateMovingRight();
     void stateJump();

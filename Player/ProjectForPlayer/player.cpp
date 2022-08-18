@@ -17,7 +17,7 @@ Player::Player() : scaleX(0), scaleY(0), state(Drop) {
 
 Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
                int DistanceBetweenTiles, float PosX, float PosY, float Health, float SpeedX, float ScaleX, float ScaleY)
-    : scaleX(ScaleX), scaleY(ScaleY), state(Drop) {
+    : scaleX(ScaleX), scaleY(ScaleY), state(Drop), direction(Right) {
 
     // Инициализация полей родительского класса
     xInTexture = XInTexture;
@@ -99,7 +99,7 @@ void Player::motionFrameChange() {
 void Player::stateControl() {
     switch (state) {
     case Stand:
-        stateStand();           break;
+        stateStand(direction);  break;
 
     case MovingRight:
         stateMovingRight();     break;
@@ -130,7 +130,7 @@ void Player::stateControl() {
     }
 }
 
-void Player::stateStand() {
+void Player::stateStand(DirectionEnum& direction) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)){
         state = StandGun;
     }
@@ -144,14 +144,18 @@ void Player::stateStand() {
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         state = MovingLeft;
     }
-    else {
+    else if (direction == Right){
         sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
+    }
+    else if (direction == Left){
+        sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));
     }
 }
 
 void Player::stateMovingLeft() {
     posX -= dTime * speedX;
     state = Stand;
+    direction = Left;
 
     sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width, yInTexture, -width, height));
 }
@@ -159,6 +163,7 @@ void Player::stateMovingLeft() {
 void Player::stateMovingRight() {
     posX += dTime * speedX;
     state = Stand;
+    direction = Right;
 
     sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame), yInTexture, width, height));
 }
@@ -169,16 +174,23 @@ void Player::stateJump() {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             posX += dTime * speedX;
+            direction = Right;
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             posX -= dTime * speedX;
+            direction = Left;
         }
     }
     else {
         state = Drop;
     }
 
-    sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
+    if (direction == Right){
+        sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
+    }
+    else if (direction == Left){
+        sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));
+    }
 }
 
 void Player::stateDrop() {
@@ -191,10 +203,19 @@ void Player::stateDrop() {
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             posX += dTime * speedX;
+            direction = Right;
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             posX -= dTime * speedX;
+            direction = Left;
         }
+    }
+
+    if (direction == Right){
+        sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
+    }
+    else if (direction == Left){
+        sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));
     }
 }
 
