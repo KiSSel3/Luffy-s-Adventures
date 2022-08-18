@@ -6,7 +6,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-
 class Application {
 public:
     Application(std::string filePath);
@@ -17,8 +16,9 @@ public:
 private:
     std::shared_ptr<sf::RenderWindow> mainWindow;
     sf::Clock clock;
-    float mainTime;
-    std::string filePath;
 
+    Player player;
+
+    float mainTime;
 };
 #endif // APPLICATION_H

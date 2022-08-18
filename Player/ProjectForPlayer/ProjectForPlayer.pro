@@ -19,14 +19,13 @@ HEADERS += \
     personages.h \
     player.h
 
-INCLUDEPATH += D:\Programming\Luffy-s-Adventures\Luffy-s-Adventures\SFML\SFML-2.5.1\include
-DEPENDPATH += D:\Programming\Luffy-s-Adventures\Luffy-s-Adventures\SFML\SFML-2.5.1\include
+INCLUDEPATH += $$PWD/SFML/include
+DEPENDPATH += $$PWD/SFML/include
 
-LIBS += -LD:\Programming\Luffy-s-Adventures\Luffy-s-Adventures\SFML\LIBS\
+LIBS += -L$$PWD/SFML/lib/
 
-CONFIG(debug, debug|release): LIBS += -lsfml-audio-d -lsfml-system-d -lsfml-network-d -lsfml-main-d -lsfml-window-d -lsfml-graphics-d
-CONFIG(release, debug|release): LIBS += -lsfml-audio -lsfml-system -lsfml-network -lsfml-main -lsfml-window -lsfml-graphics
-
+CONFIG(release, debug|release): LIBS += -L$$PWD/SFML/lib/ -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-window -lsfml-system
+CONFIG(debug, debug|release): LIBS += -L$$PWD/SFML/lib/ -lsfml-audio-d -lsfml-graphics-d -lsfml-network-d -lsfml-window-d -lsfml-system-d
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -4,6 +4,11 @@
 #include <SFML/Graphics.hpp>
 
 class Personages : public sf::Drawable {
+public:
+    virtual ~Personages() { };
+    void dTimeSet(float dTime);               // инициализация поля dTime
+    void speedChange(float speedX);           // изменение скорости объекта
+
 protected:
     sf::Texture texture;                      // текстура объекта
     sf::Sprite sprite;                        // спрайт с объектом
@@ -30,10 +35,6 @@ protected:
     virtual void collision() = 0;             // функция для решения коллизии
     virtual void healthChange() = 0;          // изменение здоровья объекта
     virtual void motionFrameChange() = 0;     // изменение тайла в спрайте
-
-public:
-    void dTimeSet(float dTime);               // инициализация поля dTime
-    void speedChange(float speedX);           // изменение скорости объекта
 };
 
 #endif // PERSONAGES_H

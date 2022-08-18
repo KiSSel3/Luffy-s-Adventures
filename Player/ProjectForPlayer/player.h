@@ -5,8 +5,17 @@
 
 class Player : public Personages {
 public:
-    Player(std::string Path, int XInTexture, int YInTexture, int Width, int Height,
-           int DistanceBetweenTiles, float PosX, float PosY,float Health, float SpeedX);
+    Player();
+
+    Player(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
+           int DistanceBetweenTiles, float PosX = 0, float PosY = 0, float Health = 100,
+           float SpeedX = 0.3, float scaleX = 0.3, float scaleY = 0.3);
+
+    virtual  ~Player() { };
+
+    void createPlayer(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
+                      int DistanceBetweenTiles, float PosX = 0, float PosY = 0, float Health = 100,
+                      float SpeedX = 0.3, float scaleX = 0.3, float scaleY = 0.3);
 
     void update() override ;
 
