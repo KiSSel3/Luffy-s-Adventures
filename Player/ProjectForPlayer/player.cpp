@@ -42,35 +42,40 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     sprite.setPosition(posX,posY);
 }
 
-void Player::createPlayer(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles,
-                          float PosX, float PosY, float Health, float SpeedX, float ScaleX, float ScaleY) {
+Player& Player::operator=(const Player& other) {
+    this->texture = other.texture;
 
-    // Инициализация полей родительского класса
-    xInTexture = XInTexture;
-    yInTexture = YInTexture;
-    width = Width;
-    height = Height;
-    distanceBetweenTiles = DistanceBetweenTiles;
-    posX = PosX;
-    posY = PosY;
-    health = Health;
-    speedX = SpeedX;
-    dTime = 0;
-    motionFrame = 0;
+    this->xInTexture = other.xInTexture;
+    this->yInTexture = other.yInTexture;
+    this->width = other.width;
+    this->height = other.height;
+    this->distanceBetweenTiles = other.distanceBetweenTiles;
 
-    //Инициализация полей данного класса
-    scaleX = ScaleX;
-    scaleY = ScaleY;
-    maxJumpHeight = 0;
+    this->posX = other.posX;
+    this->posY = other.posY;
 
-    // Добавление персонажа
-    if(!texture.loadFromFile(FilePath))
-        throw 1;
+    this->health = other.health;
 
-    sprite.setTexture(texture);
-    sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
-    sprite.setScale(scaleX,scaleY);
-    sprite.setPosition(posX,posY);
+    this->speedX = other.speedX;
+
+    this->dTime = other.dTime;
+
+    this->motionFrame = other.motionFrame;
+
+    this->maxJumpHeight = other.maxJumpHeight;
+
+    this->scaleX = other.scaleX;
+    this->scaleY = other.scaleY;
+
+    this->state = other.state;
+    this->direction = other.direction;
+
+    this->sprite.setTexture(this->texture);
+    this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
+    this->sprite.setScale(this->scaleX,this->scaleY);
+    this->sprite.setPosition(this->posX,this->posY);
+
+    return *this;
 }
 
 void Player::update() {

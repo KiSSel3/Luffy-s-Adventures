@@ -1,11 +1,11 @@
 #include "application.h"
 
 Application::Application(std::string filePath) {
-    filePath.erase(filePath.find("Player\\ProjectForPlayer", 0));
+    filePath.erase(filePath.find("Player\\ProjectFor", 0));
     std::replace(filePath.begin(), filePath.end(),'\\','/');
 
     mainWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920,1080),"",sf::Style::Fullscreen);
-    player.createPlayer(filePath + "images/sprites/Luffy.png", 0,0,240,324,0);
+    player = Player(filePath + "images/sprites/Luffy.png", 0,0,240,324,0);
 }
 
 Application::~Application() {

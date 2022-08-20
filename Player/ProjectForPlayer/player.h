@@ -13,9 +13,7 @@ public:
 
     virtual  ~Player() { };
 
-    void createPlayer(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
-                      int DistanceBetweenTiles, float PosX = 0, float PosY = 0, float Health = 100,
-                      float SpeedX = 0.3, float scaleX = 0.3, float scaleY = 0.3);
+    Player& operator=(const Player& other);
 
     void update() override ;
 
