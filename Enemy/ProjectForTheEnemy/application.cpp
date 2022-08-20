@@ -1,19 +1,18 @@
 #include "application.h"
 
-Application::Application(std::string filePath) : filePath(filePath) {
-    mainWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920,1080),"",sf::Style::Fullscreen);
+Application::Application(std::string filePath){
+    filePath.erase(filePath.find("Enemy\\Project", 0));
+    std::replace(filePath.begin(),filePath.end(),'\\','/');
 
-    this->filePath.erase(this->filePath.find("Enemy\\Project", 0));
-    std::replace(this->filePath.begin(),this->filePath.end(),'\\','/');
+    mainWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920,1080),"",sf::Style::Fullscreen);
+    firstEnemy = Enemy(filePath + "images/sprites/Enemy(temporarily).png", 0,0,192,312,0,10,10,100,0.1);
 }
 
 Application::~Application() {
     mainWindow->close();
 }
 
-void Application::start() {
-    Enemy enemy(filePath + "images/sprites/Enemy(temporarily).png", 0,0,192,312,0,10,10,100,0.1);
-
+void Application::start() {    
     while(mainWindow->isOpen()){
         sf::Event mainEvent;
 
@@ -34,20 +33,20 @@ void Application::start() {
                 static bool flag = false;
 
                 if(flag = !flag)
-                  mainWindow->create(sf::VideoMode::getDesktopMode(),"");
+                    mainWindow->create(sf::VideoMode::getDesktopMode(),"");
 
                 else
-                  mainWindow->create(sf::VideoMode(1520,860),"",sf::Style::Fullscreen);
+                    mainWindow->create(sf::VideoMode(1520,860),"",sf::Style::Fullscreen);
 
-              }
+            }
         }
 
-        enemy.dTimeSet(mainTime);
-        enemy.setPosPlayer(5500,5500);
-        enemy.update();
+        firstEnemy.dTimeSet(mainTime);
+        firstEnemy.setPosPlayer(5500,5500);
+        firstEnemy.update();
 
         mainWindow->clear();
-        mainWindow->draw(enemy);
+        mainWindow->draw(firstEnemy);
         mainWindow->display();
     }
 }

@@ -5,8 +5,15 @@
 
 class Enemy : public Personages {
 public:
+    Enemy();
+
     Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
-          int DistanceBetweenTiles, float PosX, float PosY, float Health = 100, float SpeedX = 0.3, int distanceToPlayer = 400, int movementArea = 400);
+          int DistanceBetweenTiles, float PosX, float PosY, float Health = 100, float SpeedX = 0.3,
+          int distanceToPlayer = 400, int movementArea = 400, float scaleX = 0.3, float scaleY = 0.3);
+
+    virtual ~Enemy() { };
+
+    Enemy &operator=(const Enemy& other);
 
     void update() override;
     void setPosPlayer(float posX,float posY);

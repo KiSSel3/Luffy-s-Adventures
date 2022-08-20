@@ -15,9 +15,11 @@ public:
 
 private:
     std::shared_ptr<sf::RenderWindow> mainWindow;
+    Enemy firstEnemy;
+
     sf::Clock clock;
     float mainTime;
-    std::string filePath;
+
 
 };
 #endif // APPLICATION_H

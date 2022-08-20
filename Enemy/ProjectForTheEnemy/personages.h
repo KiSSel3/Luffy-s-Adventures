@@ -5,6 +5,7 @@
 
 class Personages : public sf::Drawable {
 public:
+    virtual ~Personages() { };
     void dTimeSet(float dTime);               // инициализация поля dTime
     void speedChange(float speedX);           // изменение скорости объекта
 
