@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include "player.h"
+#include "enemy.h"
 
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -18,6 +19,7 @@ private:
     sf::Clock clock;
 
     Player player;
+    Enemy firstEnemy;
 
     float mainTime;
 };

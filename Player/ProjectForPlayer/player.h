@@ -17,6 +17,9 @@ public:
 
     void update() override ;
 
+    float getPosX();
+    float getPosY();
+
 private:
     int maxJumpHeight;
     float scaleX;

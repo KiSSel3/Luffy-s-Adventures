@@ -6,6 +6,7 @@ Application::Application(std::string filePath) {
 
     mainWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920,1080),"",sf::Style::Fullscreen);
     player = Player(filePath + "images/sprites/Luffy.png", 0,0,240,324,0);
+    firstEnemy = Enemy(filePath + "images/sprites/Enemy(temporarily).png", 0,0,192,312,0,1920-500,10,100,0.1);
 }
 
 Application::~Application() {
@@ -44,7 +45,12 @@ void Application::start() {
         player.dTimeSet(mainTime);
         player.update();
 
+        firstEnemy.dTimeSet(mainTime);
+        firstEnemy.setPosPlayer(player.getPosX(),player.getPosY());
+        firstEnemy.update();
+
         mainWindow->clear();
+        mainWindow->draw(firstEnemy);
         mainWindow->draw(player);
         mainWindow->display();
 

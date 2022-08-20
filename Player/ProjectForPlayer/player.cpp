@@ -243,3 +243,12 @@ void Player::stateJumpGun() {
 void Player::stateDropGun() {
     state = Stand; // заглушка
 }
+
+
+float Player::getPosX() {
+    return posX;
+}
+
+float Player::getPosY() {
+    return posY;
+}
