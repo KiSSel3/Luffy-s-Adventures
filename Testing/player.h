@@ -9,13 +9,13 @@ public:
 
     Player(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
            int DistanceBetweenTiles, int CountFrames, TileMap& map, float PosX = 0, float PosY = 0, float Health = 100,
-           float SpeedX = 0.3, float SpeedY = 0.35, float ScaleX = 0.3, float ScaleY = 0.3);
-
-    virtual  ~Player() { };
+           float SpeedX = 0.3, float SpeedY = 0.35, float ScaleX = 0.296296296, float ScaleY = 0.296296296);
 
     Player& operator=(const Player& other);
 
-    void update(sf::RenderWindow& window) override ;
+    virtual  ~Player() { };
+
+    void update() override ;
 
     float getPosX();
     float getPosY();
@@ -27,7 +27,8 @@ private:
     enum MainStateEnum      {Stand, MovingLeft, MovingRight, Jump, Drop}  mainState;
     enum GunStateEnum       {NotGun, WithGun}                             gunState;
 
-    void mainStateControl();
+    void drawControl();
+
     void stateStand();
     void stateMovingLeft();
     void stateMovingRight();

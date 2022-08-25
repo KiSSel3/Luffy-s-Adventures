@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <list>
 
 class Application {
 public:
@@ -18,8 +19,14 @@ public:
 private:
     sf::RenderWindow mainWindow;
     sf::Clock clock;
-    Player player;
-    Enemy firstEnemy;
+    Player* player;
+
+    Enemy* firstEnemy;
+    Enemy* secondEnemy;
+    Enemy* thirdEnemy;
+
+    std::list<Enemy*> enemyList;
+
     TileMap map;
 
     float mainTime;

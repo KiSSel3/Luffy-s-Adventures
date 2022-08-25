@@ -7,15 +7,15 @@ class Enemy : public Personages {
 public:
     Enemy();
 
-    Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
-          int DistanceBetweenTiles, TileMap& map, float PosX = 0, float PosY = 0, float Health = 100, float SpeedX = 0.3,
-          int DistanceToPlayer = 400, int MovementArea = 400, float ScaleX = 0.3, float ScaleY = 0.3);
+    Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles,
+          int CountFrames, TileMap& map, float PosX = 0, float PosY = 0, float Health = 100, float SpeedX = 0.3,
+          float SpeedY = 0.35, int DistanceToPlayer = 400, int MovementArea = 400, float ScaleX = 0.296296296, float ScaleY = 0.296296296);
 
     virtual ~Enemy() { };
 
     Enemy &operator=(const Enemy& other);
 
-    void update(sf::RenderWindow& window) override;
+    void update() override;
     void setPosPlayer(float posX,float posY);
 
 private:
@@ -27,16 +27,17 @@ private:
 
     int distanceToPlayer;
 
-    enum StateEnum {Peace, Shooting} state; //покой, стреляет
-    enum DirectionEnum {Left, Right} direction;
+    enum MainStateEnum          {Peace, Shooting}  mainState; //покой, стреляет
+    enum DirectionStateEnum     {Left, Right}      directionState;
 
     void collisionX()           override;  // = 0
     void collisionY()           override;  // = 0
     void healthChange()         override;  // = 0
     void motionFrameChange()    override;  // = 0
 
-    void stateContol();
+    void drawControl();
 
+    void stateDrop();
     void statePeace();
     void stateShooting();
 };

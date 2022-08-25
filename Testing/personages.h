@@ -13,6 +13,8 @@ public:
     void speedChange(float speedX);                     // изменение скорости объекта
     sf::FloatRect getRect();                            // получение размеров спрайта
 
+    virtual void update()  = 0;                         // корректировка координат объекта относительно карты
+
 protected:
     sf::Texture texture;                                // текстура объекта
     sf::Sprite  sprite;                                  // спрайт с объектом
@@ -42,13 +44,12 @@ protected:
 
     std::vector<Object> objectsOnMap;                   // все объекты на карте(для коллизии)
 
-    void draw(sf::RenderTarget& target, sf::RenderStates state) const override final; // Для window.draw(Person)    
-
-    virtual void update(sf::RenderWindow& window) = 0;  // корректировка координат объекта относительно карты
-    virtual void collisionX() = 0;                      // функция для решения коллизиипо X
-    virtual void collisionY() = 0;                      // функция для решения коллизиипо Y
-    virtual void healthChange() = 0;                    // изменение здоровья объекта
+    virtual void collisionX()        = 0;               // функция для решения коллизиипо X
+    virtual void collisionY()        = 0;               // функция для решения коллизиипо Y
+    virtual void healthChange()      = 0;               // изменение здоровья объекта
     virtual void motionFrameChange() = 0;               // изменение тайла в тайлсете
+
+    void draw(sf::RenderTarget& target, sf::RenderStates state) const override final; // Для window.draw(Person)
 };
 
 #endif // PERSONAGES_H

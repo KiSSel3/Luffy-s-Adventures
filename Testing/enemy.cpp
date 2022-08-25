@@ -1,6 +1,6 @@
 #include "enemy.h"
 
-Enemy::Enemy() : posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceToPlayer(0), state(Peace), direction(Right) {
+Enemy::Enemy() : posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceToPlayer(0), mainState(Peace), directionState(Right) {
     // Инициализация полей родительского класса
     xInTexture = 0;
     yInTexture = 0;
@@ -13,13 +13,18 @@ Enemy::Enemy() : posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceT
     posY = 0;
     health = 0;
     speedX = 0;
+    speedY = 0;
+    currentSpeedX = 0;
+    currentSpeedY = 0;
     dTime = 0;
+    countFrames = 0;
     motionFrame = 0;
 }
 
-Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles, TileMap& map, float PosX,
-             float PosY, float Health, float SpeedX, int DistanceToPlayer, int MovementArea, float ScaleX, float ScaleY)
-    : distanceToPlayer(DistanceToPlayer), state(Peace), direction(Right) {
+Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles,
+             int CountFrames, TileMap& map, float PosX, float PosY, float Health, float SpeedX, float SpeedY,
+             int DistanceToPlayer, int MovementArea, float ScaleX, float ScaleY)
+    : distanceToPlayer(DistanceToPlayer), mainState(Peace), directionState(Right) {
 
     // Инициализация полей родительского класса
     xInTexture = XInTexture;
@@ -33,7 +38,11 @@ Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, in
     posY = PosY;
     health = Health;
     speedX = SpeedX;
+    speedY = SpeedY;
+    currentSpeedX = 0;
+    currentSpeedY = 0;
     dTime = 0;
+    countFrames = CountFrames;
     motionFrame = 0;
 
     objectsOnMap = map.getAllObjects();
@@ -66,10 +75,16 @@ Enemy &Enemy::operator=(const Enemy &other) {
     this->health = other.health;
 
     this->speedX = other.speedX;
+    this->speedY = other.speedY;
+    this->currentSpeedX = other.currentSpeedX;
+    this->currentSpeedY = other.currentSpeedY;
 
     this->dTime = other.dTime;
 
+    this->countFrames = other.countFrames;
     this->motionFrame = other.motionFrame;
+
+    this->objectsOnMap = other.objectsOnMap;
 
     this->scaleX = other.scaleX;
     this->scaleY = other.scaleY;
@@ -82,8 +97,8 @@ Enemy &Enemy::operator=(const Enemy &other) {
 
     this->distanceToPlayer = other.distanceToPlayer;
 
-    this->state = other.state;
-    this->direction = other.direction;
+    this->mainState = other.mainState;
+    this->directionState = other.directionState;
 
     this->sprite.setTexture(this->texture);
     this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
@@ -99,89 +114,169 @@ void Enemy::setPosPlayer(float posX, float posY) {
 }
 
 void Enemy::collisionX() {
+    for (auto& object : objectsOnMap) {
+        if(getRect().intersects(object.rect)) {
+            if(object.name == "Ground") {
+                if(currentSpeedX > 0) {
+                    posX = object.rect.left - scaleX*width;
+                    currentSpeedX = 0;
 
-}
+                    directionState = Left;
+                }
+                else if(currentSpeedX < 0) {
+                    posX = object.rect.left + object.rect.width;
+                    currentSpeedX = 0;
 
-void Enemy::collisionY() {
-    if(posY+scaleY*height<1080){
-        posY += 0.3 * dTime;
+                    directionState = Right;
+                }
+            }
+        }
     }
 }
 
-void Enemy::update(sf::RenderWindow& window) {
+void Enemy::collisionY() {
+    for (auto& object : objectsOnMap) {
+        if(getRect().intersects(object.rect)) {
+            if(object.name == "Ground") {
+                if(currentSpeedY > 0) {
+                    posY = object.rect.top - scaleY*height;
+                    currentSpeedY = 0;
+                }
+            }
+        }
+    }
+}
+
+void Enemy::update() {
     motionFrameChange();
-    collisionY();
-    stateContol();
+    drawControl();
+
+    stateDrop();
+
 
     sprite.setPosition(posX, posY);
 }
 
-void Enemy::stateContol() {
-    switch (state){
-    case Peace:
-        statePeace(); break;
+void Enemy::drawControl() {
+    if (directionState == Right){
+        switch(mainState){
+        case Peace:
+            sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame),
+                                              yInTexture, width, height));                        break;
+        case Shooting:
+            sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));            break;
+        }
+    }
+    else { // directionState == Left
+        switch(mainState){
+        case Peace:
+            sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width,
+                                              yInTexture, -width, height));                       break;
+        case Shooting:
+            sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));   break;
+        }
+    }
 
+}
+
+void Enemy::stateDrop() {
+    currentSpeedX = 0;
+    currentSpeedY = speedY;
+
+    posY += currentSpeedY * dTime;
+
+    collisionY();
+
+    switch (mainState){
+    case Peace:
+        statePeace();     break;
     case Shooting:
-        stateShooting(); break;
+        stateShooting();  break;
     }
 }
 
 void Enemy::statePeace() {
-    if (posXPlayer > posX - distanceToPlayer && posXPlayer < posX + distanceToPlayer){
-        state = Shooting;
-    }
-    else {
-        switch (direction) {
-        case Right:
-            posX += speedX*dTime;
+    //    if (posXPlayer > posX - distanceToPlayer && posXPlayer < posX + distanceToPlayer && posYPlayer >= posY - (height * scaleY) / 2 && posYPlayer <= posY + (height * scaleY) / 2){
+    //        mainState = Shooting;
+    //    }
+    //    else {
+    //        switch (directionState) {
+    //        case Right:
+    //            currentSpeedX = speedX;
+    //            posX += currentSpeedX * dTime;
 
-            if (posX>maxPosX){
-                direction = Left;
-            }
+    //            if (posX>maxPosX){
+    //                directionState = Left;
+    //            }
+    //            break;
 
-            sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame), yInTexture, width, height)); break;
+    //        case Left:
+    //            currentSpeedX = -speedX;
+    //            posX += currentSpeedX *dTime;
 
-        case Left:
-            posX -= speedX*dTime;
+    //            if(posX<minPosX){
+    //                directionState = Right;
+    //            }
+    //            break;
+    //        }
+    //    }
 
-            if(posX<minPosX){
-                direction = Right;
-            }
+    switch (directionState) {
+    case Right:
+        currentSpeedX = speedX;
+        posX += currentSpeedX * dTime;
 
-            sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width, yInTexture, -width, height)); break;
+        if (posX > maxPosX){
+            directionState = Left;
         }
+        break;
+
+    case Left:
+        currentSpeedX = -speedX;
+        posX += currentSpeedX * dTime;
+
+        if(posX < minPosX){
+            directionState = Right;
+        }
+        break;
+    }
+
+    collisionX();
+
+    if (posXPlayer > posX - distanceToPlayer && posXPlayer < posX + distanceToPlayer && posYPlayer >= posY - (height * scaleY) / 2 && posYPlayer <= posY + (height * scaleY) / 2){
+        mainState = Shooting;
     }
 }
 
 void Enemy::stateShooting() {
     if (posX>posXPlayer) {
-        direction = Left;
+        directionState = Left;
     }
     else {
-        direction = Right;
+        directionState = Right;
     }
 
-    switch (direction){
-    case Right:
-        // Bullet.shoot();
+    //    //    switch (directionState){
+    //    //    case Right:
+    //    //        // Bullet.shoot();
 
-        sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height)); break;
 
-    case Left:
-        // Bullet.shoot();
 
-        sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height)); break;
-    }
+    //    //    case Left:
+    //    //        // Bullet.shoot();
 
-    if (posXPlayer < posX - distanceToPlayer || posXPlayer > posX + distanceToPlayer){
-        state = Peace;
+
+    //    //    }
+
+    if (posXPlayer < posX - distanceToPlayer || posXPlayer > posX + distanceToPlayer ||  posYPlayer < posY - (height * scaleY) || posYPlayer > posY + (height * scaleY) / 2){
+        mainState = Peace;
     }
 }
 
 void Enemy::motionFrameChange() {
     motionFrame += 0.005 * dTime;
 
-    if (motionFrame > 4){
+    if (motionFrame > countFrames){
         motionFrame = 0;
     }
 }

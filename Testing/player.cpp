@@ -100,15 +100,14 @@ Player& Player::operator=(const Player& other) {
     return *this;
 }
 
-void Player::update(sf::RenderWindow& window) {
+void Player::update() {
     motionFrameChange();
     stateDrop();
     collisionX();
 
-    mainStateControl(); // изменить название!!!!!!!!!
+    drawControl();
 
     sprite.setPosition(posX,posY);
-    //window.draw(sprite);
 }
 
 void Player::collisionX() {
@@ -249,7 +248,7 @@ void Player::stateJump() {
 
     collisionY();
 
-   if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         stateMovingRight();
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
@@ -266,7 +265,7 @@ void Player::changeGunState() {
     }
 }
 
-void Player::mainStateControl() {
+void Player::drawControl() {
     if(gunState == NotGun) {
         if (directionState == Left){
             switch (mainState) {
