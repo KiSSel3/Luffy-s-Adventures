@@ -19,6 +19,8 @@ public:
     void setPosPlayer(float posX,float posY);
 
 private:
+    float elapsedTimeAfterShooting;
+
     float posXPlayer;
     float posYPlayer;
 
@@ -27,13 +29,13 @@ private:
 
     int distanceToPlayer;
 
-    enum MainStateEnum          {Peace, Shooting}  mainState; //покой, стреляет
+    enum MainStateEnum          {Peace, Shooting}  mainState;
     enum DirectionStateEnum     {Left, Right}      directionState;
 
-    void collisionX()           override;  // = 0
-    void collisionY()           override;  // = 0
+    void collisionX()           override;
+    void collisionY()           override;
     void healthChange()         override;  // = 0
-    void motionFrameChange()    override;  // = 0
+    void shoot()                override;  // = 0
 
     void drawControl();
 

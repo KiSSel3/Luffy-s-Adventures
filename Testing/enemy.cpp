@@ -1,6 +1,6 @@
 #include "enemy.h"
 
-Enemy::Enemy() : posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceToPlayer(0), mainState(Peace), directionState(Right) {
+Enemy::Enemy()  : elapsedTimeAfterShooting(0), posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceToPlayer(0), mainState(Peace), directionState(Right) {
     // Инициализация полей родительского класса
     xInTexture = 0;
     yInTexture = 0;
@@ -19,14 +19,18 @@ Enemy::Enemy() : posXPlayer(0), posYPlayer(0), maxPosX(0), minPosX(0), distanceT
     dTime = 0;
     countFrames = 0;
     motionFrame = 0;
+
+    bullet = nullptr;
 }
 
 Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles,
              int CountFrames, TileMap& map, float PosX, float PosY, float Health, float SpeedX, float SpeedY,
              int DistanceToPlayer, int MovementArea, float ScaleX, float ScaleY)
-    : distanceToPlayer(DistanceToPlayer), mainState(Peace), directionState(Right) {
+    : elapsedTimeAfterShooting(0), distanceToPlayer(DistanceToPlayer), mainState(Peace), directionState(Right) {
 
     // Инициализация полей родительского класса
+
+    filePath = FilePath;
     xInTexture = XInTexture;
     yInTexture = YInTexture;
     width = Width;
@@ -50,8 +54,10 @@ Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, in
     maxPosX = PosX + MovementArea;
     minPosX = PosX;
 
+    bullet = nullptr;
+
     // Добавление врага
-    if(!texture.loadFromFile(FilePath))
+    if(!texture.loadFromFile(FilePath + "images/sprites/Enemy.png"))
         throw 1;
 
     sprite.setTexture(texture);
@@ -61,6 +67,8 @@ Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, in
 }
 
 Enemy &Enemy::operator=(const Enemy &other) {
+    this->filePath = other.filePath;
+
     this->texture = other.texture;
 
     this->xInTexture = other.xInTexture;
@@ -99,6 +107,8 @@ Enemy &Enemy::operator=(const Enemy &other) {
 
     this->mainState = other.mainState;
     this->directionState = other.directionState;
+
+    this->elapsedTimeAfterShooting = other.elapsedTimeAfterShooting;
 
     this->sprite.setTexture(this->texture);
     this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
@@ -148,6 +158,19 @@ void Enemy::collisionY() {
 }
 
 void Enemy::update() {
+    elapsedTimeAfterShooting += dTime;
+
+    if(elapsedTimeAfterShooting >= 500000. / 800){
+        elapsedTimeAfterShooting = 500000. / 800;
+    }
+
+    if(bullet != nullptr){
+        if (!bullet->getIsLive()){
+            delete bullet;
+            bullet = nullptr;
+        }
+    }
+
     motionFrameChange();
     drawControl();
 
@@ -196,31 +219,6 @@ void Enemy::stateDrop() {
 }
 
 void Enemy::statePeace() {
-    //    if (posXPlayer > posX - distanceToPlayer && posXPlayer < posX + distanceToPlayer && posYPlayer >= posY - (height * scaleY) / 2 && posYPlayer <= posY + (height * scaleY) / 2){
-    //        mainState = Shooting;
-    //    }
-    //    else {
-    //        switch (directionState) {
-    //        case Right:
-    //            currentSpeedX = speedX;
-    //            posX += currentSpeedX * dTime;
-
-    //            if (posX>maxPosX){
-    //                directionState = Left;
-    //            }
-    //            break;
-
-    //        case Left:
-    //            currentSpeedX = -speedX;
-    //            posX += currentSpeedX *dTime;
-
-    //            if(posX<minPosX){
-    //                directionState = Right;
-    //            }
-    //            break;
-    //        }
-    //    }
-
     switch (directionState) {
     case Right:
         currentSpeedX = speedX;
@@ -256,33 +254,28 @@ void Enemy::stateShooting() {
         directionState = Right;
     }
 
-    //    //    switch (directionState){
-    //    //    case Right:
-    //    //        // Bullet.shoot();
-
-
-
-    //    //    case Left:
-    //    //        // Bullet.shoot();
-
-
-    //    //    }
+    shoot();
 
     if (posXPlayer < posX - distanceToPlayer || posXPlayer > posX + distanceToPlayer ||  posYPlayer < posY - (height * scaleY) || posYPlayer > posY + (height * scaleY) / 2){
         mainState = Peace;
     }
 }
 
-void Enemy::motionFrameChange() {
-    motionFrame += 0.005 * dTime;
-
-    if (motionFrame > countFrames){
-        motionFrame = 0;
+void Enemy::shoot() {
+    if(bullet == nullptr && elapsedTimeAfterShooting >= 500000. / 800) {
+        elapsedTimeAfterShooting = 0;
+        switch (directionState) {
+        case Left:
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX - scaleX * 216, posY + scaleY * 218, objectsOnMap, -0.5,400,0.3, 0.3);
+            break;
+        case Right:
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX + scaleX * 216, posY + scaleY * 218, objectsOnMap, 0.5,400,0.3, 0.3/*0.153846154*/);
+            break;
+        }
     }
 }
 
-void Enemy::healthChange()
-{
+void Enemy::healthChange() {
 
 }
 

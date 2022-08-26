@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player() : directionState(Right), mainState(Stand), gunState(NotGun) {
+Player::Player() : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun) {
     // Инициализация полей родительского класса
     xInTexture = 0;
     yInTexture = 0;
@@ -19,13 +19,16 @@ Player::Player() : directionState(Right), mainState(Stand), gunState(NotGun) {
     currentSpeedY = 0;
     dTime = 0;
     motionFrame = 0;
+
+    bullet = nullptr;
 }
 
 Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,int DistanceBetweenTiles, int CountFrames,
                TileMap& map, float PosX, float PosY, float Health, float SpeedX, float SpeedY, float ScaleX, float ScaleY)
-    : directionState(Right), mainState(Stand), gunState(NotGun)
-{
+    : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun) {
     // Инициализация полей родительского класса
+    filePath = FilePath;
+
     xInTexture = XInTexture;
     yInTexture = YInTexture;
     width = Width;
@@ -46,10 +49,12 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     countFrames = CountFrames;
     motionFrame = 0;
 
+    bullet = nullptr;
+
     objectsOnMap = map.getAllObjects();
 
     // Добавление персонажа
-    if(!texture.loadFromFile(FilePath))
+    if(!texture.loadFromFile(filePath + "images/sprites/Luffy.png"))
         throw 1;
 
     sprite.setTexture(texture);
@@ -83,6 +88,9 @@ Player& Player::operator=(const Player& other) {
     this->countFrames = other.countFrames;
     this->motionFrame = other.motionFrame;
 
+    this->bullet = other.bullet;
+    this->elapsedTimeAfterShooting = other.elapsedTimeAfterShooting;
+
     this->maxJumpHeight = other.maxJumpHeight;
 
     this->scaleX = other.scaleX;
@@ -101,6 +109,17 @@ Player& Player::operator=(const Player& other) {
 }
 
 void Player::update() {
+    elapsedTimeAfterShooting += dTime;
+
+    if(elapsedTimeAfterShooting >= 500000. / 800){
+        elapsedTimeAfterShooting = 500000. / 800;
+    }
+
+    if(bullet != nullptr && !bullet->getIsLive()){
+        delete bullet;
+        bullet = nullptr;
+    }
+
     motionFrameChange();
     stateDrop();
     collisionX();
@@ -146,11 +165,17 @@ void Player::collisionY() {
     }
 }
 
-void Player::motionFrameChange() {
-    motionFrame += dTime* 0.005; // 0.005 оптимальная скорость изменения кадров
-
-    if (motionFrame > countFrames) {
-        motionFrame = 0;
+void Player::shoot() {
+    if(bullet == nullptr && elapsedTimeAfterShooting >= 500000. / 800) {
+        elapsedTimeAfterShooting = 0;
+        switch (directionState) {
+        case Left:
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,400,0.3, 0.3);
+            break;
+        case Right:
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,400,0.3, 0.3/*0.153846154*/);
+            break;
+        }
     }
 }
 
@@ -185,15 +210,12 @@ void Player::stateDrop() {
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             stateMovingRight();
-            directionState = Right;
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             stateMovingLeft();
-            directionState = Left;
         }
-
-        if (mainState == Stand){
-            stateStand();
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+            shoot();
         }
     }
 }
@@ -215,6 +237,9 @@ void Player::stateStand() {
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         stateMovingLeft();  mainState = MovingLeft;
     }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        shoot();
+    }
 }
 
 void Player::stateMovingLeft() {
@@ -224,6 +249,10 @@ void Player::stateMovingLeft() {
     currentSpeedX = -speedX;
 
     posX += currentSpeedX * dTime;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        shoot();
+    }
 }
 
 void Player::stateMovingRight() {
@@ -233,6 +262,10 @@ void Player::stateMovingRight() {
     currentSpeedX = speedX;
 
     posX += currentSpeedX * dTime;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        shoot();
+    }
 }
 
 void Player::stateJump() {
@@ -253,6 +286,9 @@ void Player::stateJump() {
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         stateMovingLeft();
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        shoot();
     }
 }
 

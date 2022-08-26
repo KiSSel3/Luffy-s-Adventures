@@ -22,6 +22,7 @@ public:
 
 private:
     int maxJumpHeight;
+    float elapsedTimeAfterShooting;
 
     enum DirectionStateEnum {Right, Left}                                 directionState;
     enum MainStateEnum      {Stand, MovingLeft, MovingRight, Jump, Drop}  mainState;
@@ -40,7 +41,7 @@ private:
     void collisionX()        override;
     void collisionY()        override;
     void healthChange()      override;  // = 0
-    void motionFrameChange() override;  // = 0
+    void shoot()             override;  // = 0
 };
 
 #endif // PLAYER_H
