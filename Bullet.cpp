@@ -1,59 +1,108 @@
 #include "Bullet.h"
 
 Bullet::Bullet(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
-    int Damage, float PosX, float PosY, float SpeedX, float Recharge, int MaxFlightLength, float ScaleX, float ScaleY)
-    : xInTexture(XInTexture), yInTexture(YInTexture), width(Width), height(Height), maxFlightLength(MaxFlightLength),
-    damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), recharge(Recharge), scaleX(ScaleX), scaleY(ScaleY) {
-
-    dTime = 0;
-    timeLimit = 0;
-
-    stateBullet = Calm;
+               int Damage, float PosX, float PosY, std::vector<Object>& ObjectsOnMap, float SpeedX, int MaxFlightLength, float ScaleX, float ScaleY)
+    : isLive(true), xInTexture(XInTexture), yInTexture(YInTexture), width(Width), height(Height), maxFlightLength(MaxFlightLength),
+      damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), dTime(0), scaleX(ScaleX), scaleY(ScaleY) {
 
     if (!texture.loadFromFile(FilePath)) {
         throw 1;
     }
 
+    maxPosX = posX + maxFlightLength;
+    minPosX = posX - maxFlightLength;
+
+    objectsOnMap = ObjectsOnMap;
+
     sprite.setTexture(texture);
-    sprite.setScale(scaleX, scaleY);
-}
 
-Bullet::Bullet() : xInTexture(0), yInTexture(0), width(0), height(0), maxFlightLength(0),
-damage(0), posX(0), posY(0), speedX(0), recharge(0), scaleX(0), scaleY(0) {
-
-    dTime = 0;
-    timeLimit = 0;
-
-    stateBullet = Calm;
-}
-
-void Bullet::draw(sf::RenderTarget& target, sf::RenderStates state) const {
-    target.draw(sprite, state);
-}
-
-void Bullet::shot(bool direction) {
-
-    if (stateBullet == Calm) {
-        timeLimit += dTime;
-
-        if (timeLimit > recharge) {
-            stateBullet = Flying;
-        }
+    if(speedX > 0){
+        sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
     }
     else {
-        if (direction) {
-            this->posX += speedX * dTime;
+        sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));
+    }
 
-            sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
+    sprite.setScale(scaleX,scaleY);
+    sprite.setPosition(posX,posY);
+}
+
+Bullet &Bullet::operator=(const Bullet &other) {
+    this->isLive = other.isLive;
+
+    this->texture = other.texture;
+
+    this->xInTexture = other.xInTexture;
+    this->yInTexture = other.yInTexture;
+    this->width = other.width;
+    this->height = other.height;
+
+    this->maxFlightLength = other.maxFlightLength;
+    this->damage = other.damage;
+
+    this->posX = other.posX;
+    this->posY = other.posY;
+    this->speedX = other.speedX;
+    this->dTime = other.dTime;
+
+    this->scaleX = other.scaleX;
+    this->scaleY = other.scaleY;
+
+    this->maxPosX = other.maxPosX;
+    this->minPosX = other.minPosX;
+
+    this->objectsOnMap = other.objectsOnMap;
+
+    this->sprite.setTexture(this->texture);
+
+    if(speedX > 0){
+        this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
+    }
+    else {
+        this->sprite.setTextureRect(sf::IntRect(this->xInTexture + this->width, this->yInTexture, -(this->width), this->height));
+    }
+
+    this->sprite.setScale(this->scaleX,this->scaleY);
+    this->sprite.setPosition(this->posX,this->posY);
+
+    return *this;
+}
+
+bool Bullet::getIsLive() {
+    return isLive;
+}
+
+void Bullet::setIsLive() {
+    isLive = false;
+}
+
+void Bullet::update() {
+    if(posX > maxPosX || posX < minPosX) {
+        isLive = false;
+    }
+    else {
+        posX += speedX * dTime;
+
+        collision();
+
+        sprite.setPosition(posX, posY);
+    }
+}
+
+void Bullet::collision() {
+    for (auto& object : objectsOnMap) {
+        if(getRect().intersects(object.rect)) {
+            if(object.name == "Ground") {
+                if(speedX > 0) {
+                    posX = object.rect.left - scaleX*width;
+                }
+                else if(speedX < 0) {
+                    posX = object.rect.left + object.rect.width;
+                }
+
+                isLive = false;
+            }
         }
-        else {
-            this->posX -= speedX * dTime;
-
-            sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));
-        }
-
-        timeLimit = 0;
-       
     }
 }
 
@@ -61,23 +110,15 @@ void Bullet::dTimeSet(float dTime) {
     this->dTime = dTime;
 }
 
-float Bullet::getPosX() {
-    return posX;
-}
-float Bullet::getPosY() {
-    return posY;
-}
-
-int Bullet::getWidth() {
-    return width;
-}
-int Bullet::getHeight() {
-    return height;
-}
 int Bullet::getDamage() {
     return damage;
 }
 
-Bullet::StateBullet Bullet::getStateBullet() {
-    return stateBullet;
+sf::FloatRect Bullet::getRect() {
+    return sf::FloatRect(posX, posY, scaleX*width, scaleY*height);
 }
+
+void Bullet::draw(sf::RenderTarget& target, sf::RenderStates state) const {
+    target.draw(sprite, state);
+}
+
