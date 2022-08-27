@@ -228,7 +228,7 @@ void Player::stateDrop() {
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             stateMovingLeft();
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        else if (gunState == WithGun && (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left))){
             shoot();
         }
     }
@@ -248,7 +248,7 @@ void Player::stateStand() {
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         stateMovingLeft();  mainState = MovingLeft;
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+    else if (gunState == WithGun && (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left))){
         shoot();
     }
 }
@@ -261,7 +261,7 @@ void Player::stateMovingLeft() {
 
     posX += currentSpeedX * dTime;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+    if (gunState == WithGun && (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left))){
         shoot();
     }
 }
@@ -274,7 +274,7 @@ void Player::stateMovingRight() {
 
     posX += currentSpeedX * dTime;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+    if (gunState == WithGun && (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left))){
         shoot();
     }
 }
@@ -298,7 +298,7 @@ void Player::stateJump() {
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         stateMovingLeft();
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+    else if (gunState == WithGun && (sf::Keyboard::isKeyPressed(sf::Keyboard::F) || sf::Mouse::isButtonPressed(sf::Mouse::Left))){
         shoot();
     }
 }
@@ -356,6 +356,46 @@ void Player::drawControl() {
         }
     }
     else { //gunState == WithGun
-        sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height)); // заглушка
+        // ЗАГЛУШКА
+        if (directionState == Left){
+            switch (mainState) {
+            case Stand:
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+
+            case MovingRight:
+                sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame),
+                                                  yInTexture, width, height));                       break;
+
+            case MovingLeft:
+                sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width,
+                                                  yInTexture, -width, height));                      break;
+
+            case Jump:
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+
+            case Drop:
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+            }
+        }
+        else { //directionState == Right
+            switch (mainState) {
+            case Stand:
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+
+            case MovingRight:
+                sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame),
+                                                  yInTexture, width, height));                       break;
+
+            case MovingLeft:
+                sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width,
+                                                  yInTexture, -width, height));                      break;
+
+            case Jump:
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+
+            case Drop:
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+            }
+        }
     }
 }

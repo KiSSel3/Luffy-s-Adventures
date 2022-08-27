@@ -18,6 +18,7 @@ public:
 
 private:
     sf::RenderWindow mainWindow;
+    sf::View view;
     sf::Clock clock;
     Player* player;
 
@@ -31,5 +32,7 @@ private:
     TileMap map;
 
     float mainTime;
+
+    void viewSetting(float posX); // настройка вида
 };
 #endif // APPLICATION_H
