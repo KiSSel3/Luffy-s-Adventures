@@ -30,7 +30,12 @@ void Platform::draw(sf::RenderTarget& target, sf::RenderStates state) const {
     target.draw(sprite, state);
 }
 
-void Platform::moving(float dTime) {
+sf::FloatRect Platform::getRect() {
+
+    return sf::FloatRect(posX, posY, scaleX * width, scaleY * height);
+}
+
+void Platform::update(float dTime) {
 
             posX += speedX * dTime;
             posY += speedY * dTime;
@@ -45,7 +50,6 @@ void Platform::moving(float dTime) {
                 lengthLimit = 0;
             }
             sprite.setPosition(posX, posY);
-
 }
 
 void Platform::dTimeSet(float dTime) {
@@ -66,3 +70,28 @@ int Platform::getHeight() {
     return height;
 }
 
+Platform& Platform::operator=(const Platform& other) {
+
+    this->texture = other.texture;
+    this->xInTexture = other.xInTexture;
+    this->yInTexture = other.yInTexture;
+    this->width = other.width;
+    this->height = other.height;
+    this->posX = other.posX;
+    this->posY = other.posY;
+    this->dTime = other.dTime;
+    this->maxFlightLength = other.maxFlightLength;
+    this->scaleX = other.scaleX;
+    this->scaleY = other.scaleY;
+    this->lengthLimit = other.lengthLimit;
+    this->timeLimit = other.timeLimit;
+    this->speedX = other.speedX;
+    this->speedY = other.speedY;
+    
+    this->sprite.setTexture(this->texture);
+    this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
+    this->sprite.setScale(this->scaleX, this->scaleY);
+    this->sprite.setPosition(this->posX, this->posY);
+
+    return *this;
+}

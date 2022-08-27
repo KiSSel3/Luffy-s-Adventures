@@ -22,7 +22,6 @@ private:
 	float dTime;
 	float timeLimit;
 	float lengthLimit;
-
 	float scaleX;
 	float scaleY;
 
@@ -34,7 +33,7 @@ public:
 		float PosX, float PosY, float SpeedX = 0, float SpeedY = 0, int MaxFlightLength = 200, float ScaleX = 1, float ScaleY = 1);
 	Platform();
 
-	void moving(float dTime);
+	void update(float dTime);
 	void dTimeSet(float dTime);
 
 	int getWidth();
@@ -43,5 +42,7 @@ public:
 	float getPosX();
 	float getPosY();	
 
-};
+	sf::FloatRect getRect();
 
+	Platform& operator= (const Platform& other);
+};
