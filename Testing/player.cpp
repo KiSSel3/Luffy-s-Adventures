@@ -20,6 +20,7 @@ Player::Player() : elapsedTimeAfterShooting(0), directionState(Right), mainState
     dTime = 0;
     motionFrame = 0;
 
+    isLive = true;
     bullet = nullptr;
 }
 
@@ -49,6 +50,7 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     countFrames = CountFrames;
     motionFrame = 0;
 
+    isLive = true;
     bullet = nullptr;
 
     objectsOnMap = map.getAllObjects();
@@ -100,6 +102,8 @@ Player& Player::operator=(const Player& other) {
     this->directionState = other.directionState;
     this->gunState = other.gunState;
 
+    this->isLive = other.isLive;
+
     this->sprite.setTexture(this->texture);
     this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
     this->sprite.setScale(this->scaleX,this->scaleY);
@@ -108,25 +112,18 @@ Player& Player::operator=(const Player& other) {
     return *this;
 }
 
-void Player::update() {
-    elapsedTimeAfterShooting += dTime;
-
-    if(elapsedTimeAfterShooting >= 500000. / 800){
-        elapsedTimeAfterShooting = 500000. / 800;
-    }
-
-    if(bullet != nullptr && !bullet->getIsLive()){
-        delete bullet;
-        bullet = nullptr;
-    }
+void Player::update(sf::RenderWindow& window, float dTime) {
+    this->dTime = dTime;
+    recharge(window, dTime);
 
     motionFrameChange();
     stateDrop();
     collisionX();
 
     drawControl();
-
     sprite.setPosition(posX,posY);
+
+    window.draw(sprite);
 }
 
 void Player::collisionX() {
@@ -166,21 +163,38 @@ void Player::collisionY() {
 }
 
 void Player::shoot() {
-    if(bullet == nullptr && elapsedTimeAfterShooting >= 500000. / 800) {
+    if(bullet == nullptr && elapsedTimeAfterShooting >= 625) {
         elapsedTimeAfterShooting = 0;
         switch (directionState) {
         case Left:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,400,0.3, 0.3);
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 50, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,450,0.3, 0.3);
             break;
         case Right:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,400,0.3, 0.3/*0.153846154*/);
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 50, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,450,0.3, 0.3/*0.153846154*/);
             break;
         }
     }
 }
 
-void Player::healthChange() {
-    //...
+void Player::recharge(sf::RenderWindow &window, float dTime) {
+    if(elapsedTimeAfterShooting < 625){
+        elapsedTimeAfterShooting += dTime;
+    }
+
+    if(bullet != nullptr && !bullet->getIsLive()){
+        delete bullet;
+        bullet = nullptr;
+    }
+    else if(bullet != nullptr && bullet->getIsLive()) {
+        bullet->update(window, dTime);
+    }
+}
+
+void Player::healthChange(int damage) {
+    health -= damage;
+    if(health <= 0){
+        isLive = false;
+    }
 }
 
 float Player::getPosX() {
@@ -224,10 +238,7 @@ void Player::stateStand() {
     currentSpeedX = 0;
     currentSpeedY = 0;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)){
-        changeGunState();
-    }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         maxJumpHeight = posY - scaleY * height;
         stateJump();        mainState = Jump;
     }

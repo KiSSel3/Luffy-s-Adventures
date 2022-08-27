@@ -15,8 +15,10 @@ public:
 
     virtual  ~Player() { };
 
-    void update() override ;
+    void update(sf::RenderWindow& window, float dTime)  override;
+    void healthChange(int damage)                       override;  // = 0
 
+    void changeGunState();
     float getPosX();
     float getPosY();
 
@@ -36,12 +38,11 @@ private:
     void stateJump();
     void stateDrop();
 
-    void changeGunState();
+    void collisionX()                                    override;
+    void collisionY()                                    override;
+    void shoot()                                         override;  // = 0
+    void recharge(sf::RenderWindow& window, float dTime) override;
 
-    void collisionX()        override;
-    void collisionY()        override;
-    void healthChange()      override;  // = 0
-    void shoot()             override;  // = 0
 };
 
 #endif // PLAYER_H

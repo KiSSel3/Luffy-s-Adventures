@@ -20,13 +20,17 @@ Enemy::Enemy()  : elapsedTimeAfterShooting(0), posXPlayer(0), posYPlayer(0), max
     countFrames = 0;
     motionFrame = 0;
 
+    damage = 0;
+
+    isLive = true;
+
     bullet = nullptr;
 }
 
 Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height, int DistanceBetweenTiles,
              int CountFrames, TileMap& map, float PosX, float PosY, float Health, float SpeedX, float SpeedY,
-             int DistanceToPlayer, int MovementArea, float ScaleX, float ScaleY)
-    : elapsedTimeAfterShooting(0), distanceToPlayer(DistanceToPlayer), mainState(Peace), directionState(Right) {
+             int DistanceToPlayer, int MovementArea, float ScaleX, float ScaleY, int Damage)
+    : damage(Damage), elapsedTimeAfterShooting(0), distanceToPlayer(DistanceToPlayer), mainState(Peace), directionState(Right) {
 
     // Инициализация полей родительского класса
 
@@ -53,6 +57,8 @@ Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, in
 
     maxPosX = PosX + MovementArea;
     minPosX = PosX;
+
+    isLive = true;
 
     bullet = nullptr;
 
@@ -108,7 +114,13 @@ Enemy &Enemy::operator=(const Enemy &other) {
     this->mainState = other.mainState;
     this->directionState = other.directionState;
 
+    this->bullet = other.bullet;
+
     this->elapsedTimeAfterShooting = other.elapsedTimeAfterShooting;
+
+    this->isLive = other.isLive;
+
+    this->damage = other.damage;
 
     this->sprite.setTexture(this->texture);
     this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
@@ -157,27 +169,17 @@ void Enemy::collisionY() {
     }
 }
 
-void Enemy::update() {
-    elapsedTimeAfterShooting += dTime;
-
-    if(elapsedTimeAfterShooting >= 500000. / 800){
-        elapsedTimeAfterShooting = 500000. / 800;
-    }
-
-    if(bullet != nullptr){
-        if (!bullet->getIsLive()){
-            delete bullet;
-            bullet = nullptr;
-        }
-    }
+void Enemy::update(sf::RenderWindow& window, float dTime) {
+    this->dTime = dTime;
+    recharge(window, dTime);
 
     motionFrameChange();
     drawControl();
 
     stateDrop();
 
-
     sprite.setPosition(posX, posY);
+    window.draw(sprite);
 }
 
 void Enemy::drawControl() {
@@ -262,21 +264,39 @@ void Enemy::stateShooting() {
 }
 
 void Enemy::shoot() {
-    if(bullet == nullptr && elapsedTimeAfterShooting >= 500000. / 800) {
+    if(bullet == nullptr && elapsedTimeAfterShooting >= 625) {
         elapsedTimeAfterShooting = 0;
+
         switch (directionState) {
         case Left:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX - scaleX * 216, posY + scaleY * 218, objectsOnMap, -0.5,400,0.3, 0.3);
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, damage, posX - scaleX * 216, posY + scaleY * 218, objectsOnMap, -0.5,400,0.3, 0.3);
             break;
         case Right:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 20, posX + scaleX * 216, posY + scaleY * 218, objectsOnMap, 0.5,400,0.3, 0.3/*0.153846154*/);
+            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, damage, posX + scaleX * 216, posY + scaleY * 218, objectsOnMap, 0.5,400,0.3, 0.3/*0.153846154*/);
             break;
         }
     }
 }
 
-void Enemy::healthChange() {
+void Enemy::recharge(sf::RenderWindow &window, float dTime) {
+    if(elapsedTimeAfterShooting < 625){
+        elapsedTimeAfterShooting += dTime;
+    }
 
+    if(bullet != nullptr && !bullet->getIsLive()){
+        delete bullet;
+        bullet = nullptr;
+    }
+    else if(bullet != nullptr && bullet->getIsLive()) {
+        bullet->update(window, dTime);
+    }
+}
+
+void Enemy::healthChange(int damage) {
+    health -= damage;
+    if(health <= 0){
+        isLive = false;
+    }
 }
 
 

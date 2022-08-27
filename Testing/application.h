@@ -26,6 +26,7 @@ private:
     Enemy* thirdEnemy;
 
     std::list<Enemy*> enemyList;
+    std::list<Enemy*>::iterator it;
 
     TileMap map;
 

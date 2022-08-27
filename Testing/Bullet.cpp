@@ -3,7 +3,7 @@
 Bullet::Bullet(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,
                int Damage, float PosX, float PosY, std::vector<Object>& ObjectsOnMap, float SpeedX, int MaxFlightLength, float ScaleX, float ScaleY)
     : isLive(true), xInTexture(XInTexture), yInTexture(YInTexture), width(Width), height(Height), maxFlightLength(MaxFlightLength),
-      damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), dTime(0), scaleX(ScaleX), scaleY(ScaleY) {
+      damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), scaleX(ScaleX), scaleY(ScaleY) {
 
     if (!texture.loadFromFile(FilePath)) {
         throw 1;
@@ -43,7 +43,6 @@ Bullet &Bullet::operator=(const Bullet &other) {
     this->posX = other.posX;
     this->posY = other.posY;
     this->speedX = other.speedX;
-    this->dTime = other.dTime;
 
     this->scaleX = other.scaleX;
     this->scaleY = other.scaleY;
@@ -72,11 +71,11 @@ bool Bullet::getIsLive() {
     return isLive;
 }
 
-void Bullet::setIsLive() {
+void Bullet::changeIsLive() {
     isLive = false;
 }
 
-void Bullet::update() {
+void Bullet::update(sf::RenderWindow &window, float dTime) {
     if(posX > maxPosX || posX < minPosX) {
         isLive = false;
     }
@@ -86,6 +85,7 @@ void Bullet::update() {
         collision();
 
         sprite.setPosition(posX, posY);
+        window.draw(sprite);
     }
 }
 
@@ -106,19 +106,11 @@ void Bullet::collision() {
     }
 }
 
-void Bullet::dTimeSet(float dTime) {
-    this->dTime = dTime;
-}
-
 int Bullet::getDamage() {
     return damage;
 }
 
 sf::FloatRect Bullet::getRect() {
     return sf::FloatRect(posX, posY, scaleX*width, scaleY*height);
-}
-
-void Bullet::draw(sf::RenderTarget& target, sf::RenderStates state) const {
-    target.draw(sprite, state);
 }
 

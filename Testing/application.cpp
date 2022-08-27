@@ -39,8 +39,14 @@ void Application::start() {
                 mainWindow.close();
             }
 
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
-                mainWindow.close();
+            if(mainEvent.type == sf::Event::KeyPressed){
+                if(mainEvent.key.code == sf::Keyboard::E){
+                    player->changeGunState();
+                }
+                if(mainEvent.key.code == sf::Keyboard::Escape){
+                    mainWindow.close();
+                }
+
             }
 
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::F)){
@@ -55,37 +61,42 @@ void Application::start() {
             }
         }
 
-        player->dTimeSet(mainTime);
-        player->update();
-
-        for (auto* object : enemyList) {
-            object->dTimeSet(mainTime);
-            object->setPosPlayer(player->getPosX(),player->getPosY());
-            object->update();
-
-            if(object->getBullet() != nullptr) {
-                object->getBullet()->dTimeSet(mainTime);
-                object->getBullet()->update();
-            }
-        }
 
         mainWindow.clear();
         mainWindow.draw(map);
+        player->update(mainWindow, mainTime);
 
-        for (auto* object : enemyList) {
-            mainWindow.draw(*object);
-            if(object->getBullet() != nullptr) {
-                mainWindow.draw(*(object->getBullet()));
+        for (it = enemyList.begin(); it != enemyList.end();) {
+            Enemy* object = *it;
+
+            object->setPosPlayer(player->getPosX(),player->getPosY());
+            object->update(mainWindow, mainTime);
+
+            //cтрельба врагов
+            if(object->getBullet() != nullptr && object->getBullet()->getRect().intersects(player->getRect())){
+                player->healthChange(object->getBullet()->getDamage());
+                object->getBullet()->changeIsLive();
+            }
+
+            if(!player->getIsLive()) {
+                mainWindow.close();
+            }
+
+            //стрельба персонажа
+            if(player->getBullet() != nullptr && player->getBullet()->getRect().intersects(object->getRect())){
+                object->healthChange(player->getBullet()->getDamage());
+                player->getBullet()->changeIsLive();
+            }
+
+            if (!object->getIsLive()){
+                it = enemyList.erase(it);
+                delete object;
+            }
+            else {
+                ++it;
             }
         }
 
-        if(player->getBullet() != nullptr) {
-            player->getBullet()->dTimeSet(mainTime);
-            player->getBullet()->update();
-            mainWindow.draw(*(player->getBullet()));
-        }
-
-        mainWindow.draw(*player);
         mainWindow.display();
     }
 }
