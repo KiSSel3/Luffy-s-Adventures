@@ -63,6 +63,9 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));
     sprite.setScale(scaleX,scaleY);
     sprite.setPosition(posX,posY);
+
+    shootBuffer.loadFromFile(FilePath + "sound/Shoot.ogg");
+    shootSound.setBuffer(shootBuffer);
 }
 
 Player& Player::operator=(const Player& other) {
@@ -108,6 +111,9 @@ Player& Player::operator=(const Player& other) {
     this->sprite.setTextureRect(sf::IntRect(this->xInTexture, this->yInTexture, this->width, this->height));
     this->sprite.setScale(this->scaleX,this->scaleY);
     this->sprite.setPosition(this->posX,this->posY);
+
+    this->shootBuffer = other.shootBuffer;
+    this->shootSound.setBuffer(this->shootBuffer);
 
     return *this;
 }
@@ -164,13 +170,14 @@ void Player::collisionY() {
 
 void Player::shoot() {
     if(bullet == nullptr && elapsedTimeAfterShooting >= 625) {
+        shootSound.play();
         elapsedTimeAfterShooting = 0;
         switch (directionState) {
         case Left:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 50, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,450,0.3, 0.3);
+            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,450,0.3, 0.3);
             break;
         case Right:
-            bullet = new Bullet(filePath + "images/sprites/bullet.png", 0,0, 31, 13, 50, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,450,0.3, 0.3/*0.153846154*/);
+            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,450,0.3, 0.3/*0.153846154*/);
             break;
         }
     }

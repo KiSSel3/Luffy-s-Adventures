@@ -45,6 +45,10 @@ private:
     void stateDrop();
     void statePeace();
     void stateShooting();
+
+    //звук тест
+    sf::SoundBuffer shootBuffer;
+    sf::Sound shootSound;
 };
 
 #endif // ENEMY_H

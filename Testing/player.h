@@ -43,6 +43,10 @@ private:
     void shoot()                                         override;  // = 0
     void recharge(sf::RenderWindow& window, float dTime) override;
 
+
+    //звук тест
+    sf::SoundBuffer shootBuffer;
+    sf::Sound shootSound;
 };
 
 #endif // PLAYER_H

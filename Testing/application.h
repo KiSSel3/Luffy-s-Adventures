@@ -33,6 +33,11 @@ private:
 
     float mainTime;
 
+    float viewPosX;
+    float viewPosY;
+
+    bool viewTied;
+
     void viewSetting(float posX); // настройка вида
 };
 #endif // APPLICATION_H

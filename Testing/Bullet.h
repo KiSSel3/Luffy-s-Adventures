@@ -4,6 +4,7 @@
 #include "map.h"
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 class Bullet {
 public:

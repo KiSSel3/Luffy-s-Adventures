@@ -5,7 +5,7 @@ Bullet::Bullet(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     : isLive(true), xInTexture(XInTexture), yInTexture(YInTexture), width(Width), height(Height), maxFlightLength(MaxFlightLength),
       damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), scaleX(ScaleX), scaleY(ScaleY) {
 
-    if (!texture.loadFromFile(FilePath)) {
+    if (!texture.loadFromFile(FilePath + "images/sprites/bullet.png")) {
         throw 1;
     }
 
