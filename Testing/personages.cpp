@@ -17,7 +17,7 @@ Bullet *Personages::getBullet() {
 }
 
 void Personages::motionFrameChange() {
-    motionFrame += dTime* 0.005; // 0.005 оптимальная скорость изменения кадров
+    motionFrame += dTime * 0.005; // 0.005 оптимальная скорость изменения кадров
 
     if (motionFrame > countFrames) {
         motionFrame = 0;

@@ -1,6 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "pausemenu.h"
 #include "player.h"
 #include "enemy.h"
 #include "map.h"
@@ -14,17 +15,21 @@ public:
     Application(std::string filePath);
     ~Application();
 
-    void start();
+    void startingGame();
+    void createWindow();
 
 private:
     sf::RenderWindow mainWindow;
     sf::View view;
+
     sf::Clock clock;
+
     Player* player;
 
-    Enemy* firstEnemy;
-    Enemy* secondEnemy;
-    Enemy* thirdEnemy;
+    Enemy* enemy_1;
+    Enemy* enemy_2;
+    Enemy* enemy_3;
+    Enemy* enemy_4;
 
     std::list<Enemy*> enemyList;
     std::list<Enemy*>::iterator it;
@@ -35,9 +40,12 @@ private:
 
     float viewPosX;
     float viewPosY;
+    bool  viewTied;
 
-    bool viewTied;
+    std::string filePath;
 
-    void viewSetting(float posX); // настройка вида
+    PauseMenu* pauseMenu;
+
+    void viewSetting(float posX);
 };
 #endif // APPLICATION_H

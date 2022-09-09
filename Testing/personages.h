@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <list>
 
 class Personages {
 public:
@@ -54,6 +55,9 @@ protected:
     float motionFrame;                                                // номер тайла в тайлсете
 
     std::vector<Object> objectsOnMap;                                 // все объекты на карте(для коллизии)
+
+    sf::SoundBuffer shootBuffer;                                      // буфер со звуком стрельбы
+    sf::Sound shootSound;                                             // звук стрельбы
 
     virtual void collisionX()                  = 0;                   // функция для решения коллизиипо X
     virtual void collisionY()                  = 0;                   // функция для решения коллизиипо Y

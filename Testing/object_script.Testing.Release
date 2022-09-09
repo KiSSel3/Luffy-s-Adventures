@@ -1,0 +1,13 @@
+release/Bullet.o
+release/application.o
+release/enemy.o
+release/main.o
+release/mainmenu.o
+release/map.o
+release/pausemenu.o
+release/personages.o
+release/player.o
+release/styleformenu.o
+release/tinyxml2.o
+release/moc_mainmenu.o
+release/moc_pausemenu.o

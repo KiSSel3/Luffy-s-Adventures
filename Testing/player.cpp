@@ -64,8 +64,22 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     sprite.setScale(scaleX,scaleY);
     sprite.setPosition(posX,posY);
 
+    //Звук
     shootBuffer.loadFromFile(FilePath + "sound/Shoot.ogg");
     shootSound.setBuffer(shootBuffer);
+
+//    //Сердца
+//    heartTexture.loadFromFile(filePath + "images/sprites/Heart.png");
+//    for (short int i = 0, x = 0, y = 0; i < 5; ++i) {
+//        sf::Sprite heartSprite;
+//        heartSprite.setTexture(heartTexture);
+//        heartSprite.setTextureRect(sf::IntRect(4, 8, 503, 462));
+//        heartSprite.setScale(0.1,0.1);
+//        heartSprite.setPosition(x, y);
+//        heartList.push_back(heartSprite);
+
+//        x+=100;
+//    }
 }
 
 Player& Player::operator=(const Player& other) {
@@ -115,6 +129,9 @@ Player& Player::operator=(const Player& other) {
     this->shootBuffer = other.shootBuffer;
     this->shootSound.setBuffer(this->shootBuffer);
 
+//    this->heartTexture = other.heartTexture;
+//    this->heartList = other.heartList;
+
     return *this;
 }
 
@@ -128,6 +145,10 @@ void Player::update(sf::RenderWindow& window, float dTime) {
 
     drawControl();
     sprite.setPosition(posX,posY);
+
+//    for(auto& object : heartList){
+//        window.draw(object);
+//    }
 
     window.draw(sprite);
 }
@@ -171,15 +192,17 @@ void Player::collisionY() {
 void Player::shoot() {
     if(bullet == nullptr && elapsedTimeAfterShooting >= 625) {
         shootSound.play();
-        elapsedTimeAfterShooting = 0;
+
         switch (directionState) {
         case Left:
-            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX - scaleX * 167, posY + scaleY * 234, objectsOnMap, -0.5,450,0.3, 0.3);
+            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX - scaleX * 186, posY + scaleY * 210, objectsOnMap, -0.5,450,0.3, 0.3);
             break;
         case Right:
-            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX + scaleX * 167, posY + scaleY * 234, objectsOnMap, 0.5,450,0.3, 0.3/*0.153846154*/);
+            bullet = new Bullet(filePath, 0,0, 31, 13, 50, posX + scaleX * 186, posY + scaleY * 210, objectsOnMap, 0.5,450,0.3, 0.3/*0.153846154*/);
             break;
         }
+
+        elapsedTimeAfterShooting = 0;
     }
 }
 
@@ -324,46 +347,45 @@ void Player::drawControl() {
         if (directionState == Left){
             switch (mainState) {
             case Stand:
-                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture + height, -width, height));  break;
 
             case MovingRight:
                 sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame),
-                                                  yInTexture, width, height));                       break;
+                                                  yInTexture + height, width, height));                       break;
 
             case MovingLeft:
                 sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width,
-                                                  yInTexture, -width, height));                      break;
+                                                  yInTexture + height, -width, height));                      break;
 
             case Jump:
-                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture + height, -width, height));  break;
 
             case Drop:
-                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture, -width, height));  break;
+                sprite.setTextureRect(sf::IntRect(xInTexture + width, yInTexture + height, -width, height));  break;
             }
         }
         else { //directionState == Right
             switch (mainState) {
             case Stand:
-                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture + height, width, height));           break;
 
             case MovingRight:
                 sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame),
-                                                  yInTexture, width, height));                       break;
+                                                  yInTexture + height, width, height));                       break;
 
             case MovingLeft:
                 sprite.setTextureRect(sf::IntRect(xInTexture + (distanceBetweenTiles + width) * int(motionFrame) + width,
-                                                  yInTexture, -width, height));                      break;
+                                                  yInTexture + height, -width, height));                      break;
 
             case Jump:
-                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture + height, width, height));           break;
 
             case Drop:
-                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture, width, height));           break;
+                sprite.setTextureRect(sf::IntRect(xInTexture, yInTexture + height, width, height));           break;
             }
         }
     }
     else { //gunState == WithGun
-        // ЗАГЛУШКА
         if (directionState == Left){
             switch (mainState) {
             case Stand:
