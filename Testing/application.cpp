@@ -132,17 +132,6 @@ void Application::startingGame() {
             }
         }
 
-        for(itPlatform = platformList.begin(); itPlatform != platformList.end();) {
-            Entity* object = *itPlatform;
-
-            object->update(mainWindow, mainTime);
-
-            if(player->getRect().intersects(object->getRect())) {
-
-            }
-            ++itPlatform;
-        }
-
         for (itEnemy = enemyList.begin(); itEnemy != enemyList.end();) {
             Enemy* object = *itEnemy;
 
@@ -240,16 +229,16 @@ void Application::playerStatisticView() {
 void Application::createEnemyList() {
     std::vector<Object> objectEnemy = map.getObjectsByName("enemy");
 
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, objectEnemy[0].rect.left,objectEnemy[0].rect.top, 100, 0.10, 0.35, 400, 1000  - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[1].rect.left, objectEnemy[1].rect.top, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[2].rect.left, objectEnemy[2].rect.top, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[3].rect.left, objectEnemy[3].rect.top, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[4].rect.left, objectEnemy[4].rect.top, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[5].rect.left, objectEnemy[5].rect.top, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[6].rect.left, objectEnemy[6].rect.top, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[7].rect.left, objectEnemy[7].rect.top, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[8].rect.left, objectEnemy[8].rect.top, 100, 0.02, 0.35, 400, 32   - 0.258064516 * 234, 0.258064516, 0.258064516));
-    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[9].rect.left, objectEnemy[9].rect.top, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[0].rect.left, -200, 100, 0.10, 0.35, 400, 1000  - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[1].rect.left, -200, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[2].rect.left, -200, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[3].rect.left, -200, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[4].rect.left, -200, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[5].rect.left, -200, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[6].rect.left, -200, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[7].rect.left, -200, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[8].rect.left, -200, 100, 0.02, 0.35, 400, 32   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[9].rect.left, -200, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
 
 }
 

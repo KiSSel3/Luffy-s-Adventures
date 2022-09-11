@@ -49,9 +49,6 @@ private:
     std::list<Entity*> spikeList;
     std::list<Entity*>::iterator itSpike;
 
-    std::list<Entity*> platformList;
-    std::list<Entity*>::iterator itPlatform;
-
     TileMap map;
 
     float mainTime;
