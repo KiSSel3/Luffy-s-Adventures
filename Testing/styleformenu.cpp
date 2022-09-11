@@ -2,7 +2,7 @@
 
 QString StyleForMenu::WidgetStyle(std::string FilePath) {
     return "QWidget {"
-           "   background-image: url(" + QString::fromStdString(FilePath) + "images/forMenu/Background.jpg)"
+           "   background-image: url(" + QString::fromStdString(FilePath) + "images/Background.jpg)"
            "}";
 }
 

@@ -39,7 +39,6 @@ public:
     QVBoxLayout *verticalLayout;
     QPushButton *PlayButton;
     QSpacerItem *verticalSpacer_5;
-    QPushButton *LevelButton;
     QSpacerItem *verticalSpacer_4;
     QPushButton *ExitButton;
     QSpacerItem *verticalSpacer_3;
@@ -127,15 +126,6 @@ public:
 
         verticalLayout->addItem(verticalSpacer_5);
 
-        LevelButton = new QPushButton(centralwidget);
-        LevelButton->setObjectName(QString::fromUtf8("LevelButton"));
-        sizePolicy.setHeightForWidth(LevelButton->sizePolicy().hasHeightForWidth());
-        LevelButton->setSizePolicy(sizePolicy);
-        LevelButton->setMinimumSize(QSize(400, 100));
-        LevelButton->setFont(font1);
-
-        verticalLayout->addWidget(LevelButton);
-
         verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer_4);
@@ -202,7 +192,6 @@ public:
         MainMenu->setWindowTitle(QCoreApplication::translate("MainMenu", "Menu", nullptr));
         NameOfGame->setText(QCoreApplication::translate("MainMenu", "Luffy's Adventures", nullptr));
         PlayButton->setText(QCoreApplication::translate("MainMenu", "PLAY", nullptr));
-        LevelButton->setText(QCoreApplication::translate("MainMenu", "LEVEL", nullptr));
         ExitButton->setText(QCoreApplication::translate("MainMenu", "EXIT", nullptr));
         LanguageButton->setText(QCoreApplication::translate("MainMenu", " EN ", nullptr));
     } // retranslateUi

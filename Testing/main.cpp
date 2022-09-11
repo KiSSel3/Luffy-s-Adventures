@@ -10,9 +10,6 @@ int main(int argc, char* argv[]) try {
     MainMenu mainMenu(argv[0]);
     mainMenu.showFullScreen();
 
-//    Application app(argv[0]);
-//    app.startingMenu();
-
     return qApplication.exec(); // Для корректной работы форм
 }
 catch (int error) {

@@ -63,7 +63,7 @@ Enemy::Enemy(std::string FilePath, int XInTexture, int YInTexture, int Width, in
     bullet = nullptr;
 
     // Добавление врага
-    if(!texture.loadFromFile(FilePath + "images/sprites/Enemy.png"))
+    if(!texture.loadFromFile(FilePath + "images/Sprites/Enemy.png"))
         throw 1;
 
     sprite.setTexture(texture);
@@ -145,7 +145,7 @@ void Enemy::setPosPlayer(float posX, float posY) {
 void Enemy::collisionX() {
     for (auto& object : objectsOnMap) {
         if(getRect().intersects(object.rect)) {
-            if(object.name == "Ground") {
+            if(object.name == "ground") {
                 if(currentSpeedX > 0) {
                     posX = object.rect.left - scaleX*width;
                     currentSpeedX = 0;
@@ -166,7 +166,7 @@ void Enemy::collisionX() {
 void Enemy::collisionY() {
     for (auto& object : objectsOnMap) {
         if(getRect().intersects(object.rect)) {
-            if(object.name == "Ground") {
+            if(object.name == "ground") {
                 if(currentSpeedY > 0) {
                     posY = object.rect.top - scaleY*height;
                     currentSpeedY = 0;

@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player() : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun) {
+Player::Player() : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun), countCoin(0) {
     // Инициализация полей родительского класса
     xInTexture = 0;
     yInTexture = 0;
@@ -26,7 +26,7 @@ Player::Player() : elapsedTimeAfterShooting(0), directionState(Right), mainState
 
 Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, int Height,int DistanceBetweenTiles, int CountFrames,
                TileMap& map, float PosX, float PosY, float Health, float SpeedX, float SpeedY, float ScaleX, float ScaleY)
-    : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun) {
+    : elapsedTimeAfterShooting(0), directionState(Right), mainState(Stand), gunState(NotGun), countCoin(0) {
     // Инициализация полей родительского класса
     filePath = FilePath;
 
@@ -56,7 +56,7 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     objectsOnMap = map.getAllObjects();
 
     // Добавление персонажа
-    if(!texture.loadFromFile(filePath + "images/sprites/Luffy.png"))
+    if(!texture.loadFromFile(filePath + "images/Sprites/Luffy.png"))
         throw 1;
 
     sprite.setTexture(texture);
@@ -67,19 +67,6 @@ Player::Player(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     //Звук
     shootBuffer.loadFromFile(FilePath + "sound/Shoot.ogg");
     shootSound.setBuffer(shootBuffer);
-
-//    //Сердца
-//    heartTexture.loadFromFile(filePath + "images/sprites/Heart.png");
-//    for (short int i = 0, x = 0, y = 0; i < 5; ++i) {
-//        sf::Sprite heartSprite;
-//        heartSprite.setTexture(heartTexture);
-//        heartSprite.setTextureRect(sf::IntRect(4, 8, 503, 462));
-//        heartSprite.setScale(0.1,0.1);
-//        heartSprite.setPosition(x, y);
-//        heartList.push_back(heartSprite);
-
-//        x+=100;
-//    }
 }
 
 Player& Player::operator=(const Player& other) {
@@ -129,9 +116,6 @@ Player& Player::operator=(const Player& other) {
     this->shootBuffer = other.shootBuffer;
     this->shootSound.setBuffer(this->shootBuffer);
 
-//    this->heartTexture = other.heartTexture;
-//    this->heartList = other.heartList;
-
     return *this;
 }
 
@@ -146,17 +130,13 @@ void Player::update(sf::RenderWindow& window, float dTime) {
     drawControl();
     sprite.setPosition(posX,posY);
 
-//    for(auto& object : heartList){
-//        window.draw(object);
-//    }
-
     window.draw(sprite);
 }
 
 void Player::collisionX() {
     for (auto& object : objectsOnMap) {
         if(getRect().intersects(object.rect)) {
-            if(object.name == "Ground") {
+            if(object.name == "ground") {
                 if(currentSpeedX > 0) {
                     posX = object.rect.left - scaleX*width;
                     currentSpeedX = 0;
@@ -166,6 +146,14 @@ void Player::collisionX() {
                     posX = object.rect.left + object.rect.width;
                 }
             }
+
+            if(object.name == "water") {
+                isLive = false;
+            }
+
+            if(object.name == "end") {
+                isLive = false;
+            }
         }
     }
 }
@@ -173,7 +161,7 @@ void Player::collisionX() {
 void Player::collisionY() {
     for (auto& object : objectsOnMap) {
         if(getRect().intersects(object.rect)) {
-            if(object.name == "Ground") {
+            if(object.name == "ground") {
                 if(currentSpeedY > 0) {
                     posY = object.rect.top - scaleY*height;
                     currentSpeedY = 0;
@@ -184,6 +172,14 @@ void Player::collisionY() {
                     currentSpeedY = 0;
                     mainState = Drop;
                 }
+            }
+
+            if(object.name == "water") {
+                isLive = false;
+            }
+
+            if(object.name == "end") {
+                isLive = false;
             }
         }
     }
@@ -233,6 +229,18 @@ float Player::getPosX() {
 
 float Player::getPosY() {
     return posY;
+}
+
+void Player::changeCountCoin() {
+    ++countCoin;
+}
+
+int Player::getHealth() {
+    return health;
+}
+
+int Player::getCountCoin() {
+    return countCoin;
 }
 
 void Player::stateDrop() {

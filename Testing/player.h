@@ -22,6 +22,11 @@ public:
     float getPosX();
     float getPosY();
 
+    void changeCountCoin();
+
+    int getHealth();
+    int getCountCoin();
+
 private:
     sf::Texture heartTexture; //временно
 
@@ -37,6 +42,8 @@ private:
     enum DirectionStateEnum {Right, Left}                                 directionState;
     enum MainStateEnum      {Stand, MovingLeft, MovingRight, Jump, Drop}  mainState;
     enum GunStateEnum       {NotGun, WithGun}                             gunState;
+
+    int countCoin;
 
     void drawControl();
 

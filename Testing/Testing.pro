@@ -10,12 +10,16 @@ CONFIG += c++11
 
 SOURCES += \
     Bullet.cpp \
+    Coin.cpp \
+    Entity.cpp \
+    Fruit.cpp \
+    Platform.cpp \
+    Spike.cpp \
     application.cpp \
     enemy.cpp \
     main.cpp \
     mainmenu.cpp \
     map.cpp \
-    pausemenu.cpp \
     personages.cpp \
     player.cpp \
     styleformenu.cpp \
@@ -24,11 +28,15 @@ SOURCES += \
 
 HEADERS += \
     Bullet.h \
+    Coin.h \
+    Entity.h \
+    Fruit.h \
+    Platform.h \
+    Spike.h \
     application.h \
     enemy.h \
     mainmenu.h \
     map.h \
-    pausemenu.h \
     personages.h \
     player.h \
     styleformenu.h \
@@ -48,7 +56,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    mainmenu.ui \
-    pausemenu.ui
+    mainmenu.ui
 
 RESOURCES +=
+
+win32:RC_FILE = icon.rc

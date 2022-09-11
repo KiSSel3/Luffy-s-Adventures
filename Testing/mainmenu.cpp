@@ -20,7 +20,6 @@ void MainMenu::setStyle() { //функция для добавления сти�
     setStyleSheet(StyleForMenu::WidgetStyle(filePath));
     ui->ExitButton->setStyleSheet(StyleForMenu::ButtonsStyle());
     ui->PlayButton->setStyleSheet(StyleForMenu::ButtonsStyle());
-    ui->LevelButton->setStyleSheet(StyleForMenu::ButtonsStyle());
     ui->LanguageButton->setStyleSheet(StyleForMenu::LanguageButtonStyle());
     ui->NameOfGame->setStyleSheet(StyleForMenu::LabelStyle());
 }
@@ -47,14 +46,12 @@ void MainMenu::on_LanguageButton_clicked() { // замена языка
         ui->LanguageButton->setText("RU");
         ui->PlayButton->setText("ИГРАТЬ");
         ui->ExitButton->setText("ВЫЙТИ");
-        ui->LevelButton->setText("УРОВЕНЬ");
     }
     else {
         language = EN;
         ui->LanguageButton->setText("EN");
         ui->PlayButton->setText("PLAY");
         ui->ExitButton->setText("EXIT");
-        ui->LevelButton->setText("LEVEL");
     }
 }
 
@@ -91,16 +88,7 @@ MainMenu::~MainMenu() {
     delete ui;
 }
 
-void MainMenu::on_LevelButton_clicked() {
-    // На данный момент кнопка для тестов функций
-}
-
 void MainMenu::createApplication() {
-//    if(mainApplication != nullptr) {
-//        delete mainApplication;
-//        mainApplication = nullptr;
-//    }
-
     mainApplication = new Application(filePath);
 }
 

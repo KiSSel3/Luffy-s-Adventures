@@ -25,7 +25,6 @@ private slots:
     void on_LanguageButton_clicked();
     void onScreenModeTriggered();
     void on_PlayButton_clicked();
-    void on_LevelButton_clicked();
 
 private:
     enum LanguageEnum {RUS, EN} language;

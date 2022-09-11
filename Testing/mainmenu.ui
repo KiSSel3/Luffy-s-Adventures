@@ -185,35 +185,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="LevelButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>400</width>
-                <height>100</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Rockwell Extra Bold</family>
-                <pointsize>48</pointsize>
-                <italic>false</italic>
-                <bold>true</bold>
-                <strikeout>false</strikeout>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="text">
-               <string>LEVEL</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="verticalSpacer_4">
               <property name="orientation">
                <enum>Qt::Vertical</enum>

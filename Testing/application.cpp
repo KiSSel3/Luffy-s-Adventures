@@ -7,55 +7,62 @@ Application::Application(std::string FilePath): filePath(FilePath) {
     mainWindow.create(sf::VideoMode(11520,1080),"",sf::Style::Fullscreen);
     mainWindow.setVerticalSyncEnabled(true);
 
-    map.load(filePath + "images/Map/TestViewMap.tmx", filePath + "images/forMap/all_tiles.png");
+    map.load(filePath + "images/Map.tmx", filePath + "images/TileMap.png");
 
-    Object Enemy_1 = map.getObject("Enemy_1");
-    Object Enemy_2 = map.getObject("Enemy_2");
-    Object Enemy_3 = map.getObject("Enemy_3");
-    Object Enemy_4 = map.getObject("Enemy_4");
 
-    player  = new Player(filePath, 0, 0, 240, 324, 0, 4, map, 64, -800, 100, 0.2);
-    enemy_1 = new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, Enemy_1.rect.left, Enemy_1.rect.top, 100, 0.10, 0.35, 400, 1344  - 0.258064516 * 234, 0.258064516, 0.258064516);
-    enemy_2 = new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, Enemy_2.rect.left, Enemy_2.rect.top, 100, 0.05, 0.35, 400, 224   - 0.258064516 * 234, 0.258064516, 0.258064516);
-    enemy_3 = new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, Enemy_3.rect.left, Enemy_3.rect.top, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516);
-    enemy_4 = new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, Enemy_4.rect.left, Enemy_4.rect.top, 100, 0.20, 0.35, 400, 11100 - 0.258064516 * 234, 0.258064516, 0.258064516);
-
-    enemyList.push_back(enemy_1);
-    enemyList.push_back(enemy_2);
-    enemyList.push_back(enemy_3);
-    enemyList.push_back(enemy_4);
+    Object playerObject = map.getObject("begin");
+    player  = new Player(filePath, 0, 0, 240, 324, 0, 4, map, playerObject.rect.left,-100 /*playerObject.rect.top*/, 100, 0.2);
 
     view.reset(sf::FloatRect(0,0,1920,1080));
     viewTied = true;
     viewPosX = 960;
     viewPosY = 540;
 
-    pauseMenu = new PauseMenu(filePath);
+    statisticCoin = new Coin(filePath, 0, 0, 32,32, viewPosX - 950, 74,2,2);
+
+    createCoinList();
+    createFruitList();
+    createSpikeList();
+    createEnemyList();
+
+    font.loadFromFile(filePath + "images/Font.ttf");
+    textCoin = new sf::Text("", font, 50);
+    textCoin->setColor(sf::Color::Black);
+    textCoin->setStyle(sf::Text::Bold);
+
+    textHealth = new sf::Text("", font, 50);
+    textHealth->setColor(sf::Color::Black);
+    textHealth->setStyle(sf::Text::Bold);
+
+    textureHealth.loadFromFile(filePath + "images/Sprites/Health.png");
+    spriteHealth.setTexture(textureHealth);
+    spriteHealth.setTextureRect(sf::IntRect(100, 109, 595, 502));
+    spriteHealth.setScale(0.107563025,0.12749004);
+
+    coinBuffer.loadFromFile(FilePath + "sound/Coin.ogg");
+    coinSound.setBuffer(coinBuffer);
+
+    music.openFromFile(filePath + "sound/Music.ogg");
+    music.setLoop(true);
 }
 
 Application::~Application() {
     mainWindow.close();
 
-    delete pauseMenu;
     delete player;
 
     enemyList.clear();
 }
 
 void Application::startingGame() {
+    music.play();
+
     while(mainWindow.isOpen()){
         sf::Event mainEvent;
 
         mainTime = clock.getElapsedTime().asMicroseconds();
         clock.restart();
         mainTime = mainTime/800;
-
-        if(pauseMenu->isVisible()) { //временное(но это не точно AXAXAXAX) решение паузы и выхода
-            if(pauseMenu->stopGame()) {
-                mainWindow.close();
-            }
-            mainTime = 0;
-        }
 
         while(mainWindow.pollEvent(mainEvent)) {
             if(mainEvent.type == sf::Event::Closed) {
@@ -67,18 +74,7 @@ void Application::startingGame() {
                     player->changeGunState();
                 }
                 if(mainEvent.key.code == sf::Keyboard::Escape){
-                    pauseMenu->showFullScreen();
-                }
-            }
-
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::F)){
-                static bool flag = false;
-
-                if(flag = !flag) {
-                    mainWindow.create(sf::VideoMode::getDesktopMode(),"");
-                }
-                else {
-                    mainWindow.create(sf::VideoMode(11520,1080),"",sf::Style::Fullscreen);
+                    mainWindow.close();
                 }
             }
         }
@@ -88,10 +84,67 @@ void Application::startingGame() {
 
         mainWindow.clear();
         mainWindow.draw(map);
+
         player->update(mainWindow, mainTime);
 
-        for (it = enemyList.begin(); it != enemyList.end();) {
-            Enemy* object = *it;
+        for(itSpike = spikeList.begin(); itSpike != spikeList.end();) {
+            Entity* object = *itSpike;
+
+            object->update(mainWindow, mainTime);
+
+            if(player->getRect().intersects(object->getRect())) {
+                player->healthChange(5);
+            }
+
+            ++itSpike;
+        }
+
+        for(itCoin = coinList.begin(); itCoin != coinList.end();) {
+            Entity* object = *itCoin;
+
+            object->update(mainWindow, mainTime);
+
+            if(player->getRect().intersects(object->getRect())) {
+                itCoin = coinList.erase(itCoin);
+                delete object;
+
+                player->changeCountCoin();
+                coinSound.play();
+            }
+            else {
+                ++itCoin;
+            }
+        }
+
+        for(itFruit = fruitList.begin(); itFruit != fruitList.end();) {
+            Entity* object = *itFruit;
+
+            object->update(mainWindow, mainTime);
+
+            if(player->getRect().intersects(object->getRect())) {
+                itFruit = fruitList.erase(itFruit);
+                delete object;
+
+                player->healthChange(-100);
+            }
+            else {
+                ++itFruit;
+            }
+        }
+
+        for(itPlatform = platformList.begin(); itPlatform != platformList.end();) {
+            Entity* object = *itPlatform;
+
+            object->update(mainWindow, mainTime);
+
+            if(player->getRect().intersects(object->getRect())) {
+
+            }
+            ++itPlatform;
+        }
+
+        for (itEnemy = enemyList.begin(); itEnemy != enemyList.end();) {
+            Enemy* object = *itEnemy;
 
             object->setPosPlayer(player->getPosX(),player->getPosY());
             object->update(mainWindow, mainTime);
@@ -102,10 +155,6 @@ void Application::startingGame() {
                 object->getBullet()->changeIsLive();
             }
 
-            if(!player->getIsLive()) {
-                //mainWindow.close();
-            }
-
             //стрельба персонажа
             if(player->getBullet() != nullptr && player->getBullet()->getRect().intersects(object->getRect())){
                 object->healthChange(player->getBullet()->getDamage());
@@ -113,14 +162,19 @@ void Application::startingGame() {
             }
 
             if (!object->getIsLive()){
-                it = enemyList.erase(it);
+                itEnemy = enemyList.erase(itEnemy);
                 delete object;
             }
             else {
-                ++it;
+                ++itEnemy;
             }
         }
 
+        if(!player->getIsLive()) {
+            mainWindow.close();
+        }
+
+        playerStatisticView();
         mainWindow.display();
     }
 }
@@ -158,4 +212,73 @@ void Application::viewSetting(float playerPosX) {
     }
 
     view.setCenter(viewPosX, viewPosY);
+}
+
+void Application::playerStatisticView() {
+    statisticCoin->update(mainWindow, mainTime);
+    statisticCoin->setPosX(viewPosX - 950);
+
+    std::ostringstream countCoin;
+    countCoin << player->getCountCoin();
+
+    textCoin->setString(countCoin.str());
+    textCoin->setPosition(statisticCoin->getPosX() + 70, statisticCoin->getPosY());
+    mainWindow.draw(*textCoin);
+
+    spriteHealth.setPosition(viewPosX - 950,5);
+    mainWindow.draw(spriteHealth);
+
+    std::ostringstream health;
+    health << player->getHealth();
+
+    textHealth->setString(health.str());
+    textHealth->setPosition(spriteHealth.getPosition().x + 70, spriteHealth.getPosition().y);
+    mainWindow.draw(*textHealth);
+
+}
+
+void Application::createEnemyList() {
+    std::vector<Object> objectEnemy = map.getObjectsByName("enemy");
+
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map, objectEnemy[0].rect.left,objectEnemy[0].rect.top, 100, 0.10, 0.35, 400, 1000  - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[1].rect.left, objectEnemy[1].rect.top, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[2].rect.left, objectEnemy[2].rect.top, 100, 0.02, 0.35, 400, 96    - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[3].rect.left, objectEnemy[3].rect.top, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[4].rect.left, objectEnemy[4].rect.top, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[5].rect.left, objectEnemy[5].rect.top, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[6].rect.left, objectEnemy[6].rect.top, 100, 0.02, 0.35, 400, 64   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[7].rect.left, objectEnemy[7].rect.top, 100, 0.02, 0.35, 400, 1000   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[8].rect.left, objectEnemy[8].rect.top, 100, 0.02, 0.35, 400, 32   - 0.258064516 * 234, 0.258064516, 0.258064516));
+    enemyList.push_back(new Enemy (filePath, 0, 0, 234, 372, 0, 4, map,objectEnemy[9].rect.left, objectEnemy[9].rect.top, 100, 0.02, 0.35, 400, 128   - 0.258064516 * 234, 0.258064516, 0.258064516));
+
+}
+
+void Application::createCoinList() {
+    std::vector<Object> objectCoin = map.getObjectsByName("coin");
+
+    for(auto& coin : objectCoin){
+        coinList.push_back(new Coin(filePath, 0, 0, 32,32, coin.rect.left, coin.rect.top));
+    }
+
+    objectCoin.clear();
+}
+
+void Application::createFruitList() {
+    std::vector<Object> objectFruit = map.getObjectsByName("fruit");
+
+    for(auto& fruit : objectFruit){
+        fruitList.push_back(new Fruit(filePath, 1, 381, 78,95, fruit.rect.left, fruit.rect.top, 0.41025641,0.336842105));
+    }
+
+    objectFruit.clear();
+}
+
+void Application::createSpikeList() {
+    std::vector<Object> objectSpike = map.getObjectsByName("spike");
+
+    for(auto& spike : objectSpike) {
+        spikeList.push_back(new Spike(filePath,0, 95,128, 32, spike.rect.left, spike.rect.top,1,1));
+    }
+
+    objectSpike.clear();
 }

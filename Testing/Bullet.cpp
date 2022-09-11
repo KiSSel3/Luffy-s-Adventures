@@ -5,7 +5,7 @@ Bullet::Bullet(std::string FilePath, int XInTexture, int YInTexture, int Width, 
     : isLive(true), xInTexture(XInTexture), yInTexture(YInTexture), width(Width), height(Height), maxFlightLength(MaxFlightLength),
       damage(Damage), posX(PosX), posY(PosY), speedX(SpeedX), scaleX(ScaleX), scaleY(ScaleY) {
 
-    if (!texture.loadFromFile(FilePath + "images/sprites/bullet.png")) {
+    if (!texture.loadFromFile(FilePath + "images/Sprites/Bullet.png")) {
         throw 1;
     }
 
@@ -92,7 +92,7 @@ void Bullet::update(sf::RenderWindow &window, float dTime) {
 void Bullet::collision() {
     for (auto& object : objectsOnMap) {
         if(getRect().intersects(object.rect)) {
-            if(object.name == "Ground") {
+            if(object.name == "ground") {
                 if(speedX > 0) {
                     posX = object.rect.left - scaleX*width;
                 }
